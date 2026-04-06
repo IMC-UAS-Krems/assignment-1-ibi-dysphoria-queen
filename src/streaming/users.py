@@ -10,6 +10,9 @@ Classes to implement:
     - FamilyAccountUser
     - FamilyMember
 """
+from samba.dcerpc.smb_acl import user
+
+
 class User:
     sessions=[]
     def __init__(self, name, user_id,age):
@@ -41,9 +44,15 @@ class PremiumUser(User):
     def __init__(self, name, user_id,age,subscription_start):
         super().__init__(name,user_id,age)
         self.subscription_start = subscription_start
-class FamilyAccount():
+class FamilyAccount(user):
     sub_users=[]
+    def __init__(self,name,user_id,age):
+        super().__init__(name,user_id,age)
     def add_sub_user(self,sub_user):
         self.sub_users.append(sub_user)
     def all_members(self):
         return self.sub_users
+
+class FamilyMember(user):
+    def __init__(self,name,user_id,age):
+        super().__init__(name,user_id,age)
