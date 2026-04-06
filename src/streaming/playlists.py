@@ -22,3 +22,11 @@ class Playlist:
         for track in self.tracks:
             total += (track.duration_minutes)*60
         return total
+class CollaborativePlaylist(Playlist):
+    contributors = []
+    def __init__(self,playlist_id,name,owner):
+        super().__init__(playlist_id,name,owner)
+    def add_contributor(self,contributor):
+        self.contributors.append(contributor)
+    def remove_contributor(self,contributor):
+        self.contributors.remove(contributor)
