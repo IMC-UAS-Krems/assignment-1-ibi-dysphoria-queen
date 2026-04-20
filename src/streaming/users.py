@@ -11,12 +11,13 @@ Classes to implement:
     - FamilyMember
 """
 import datetime
+from streaming import sessions,  playlists, tracks, artists, albums
 
 class User:
     sessions=[]
     def __init__(self, name, user_id,age):
         self.name = name
-        self.user_id = user_id
+        self.user_id = str(user_id)
         self.age = age
     def add_session(self,session):
         self.sessions.append(session)
@@ -33,8 +34,8 @@ class User:
     def unique_tracks_listened(self):
         count =[]
         for session in self.sessions:
-            if session.name not in count:
-                count.append(session.session_id)
+            if session.track not in count:
+                count.append(session.track)
 class FreeUser(User):
     MAX_SKIPS_PER_HOUR = 6
     def __init__(self, name, user_id,age):
@@ -52,6 +53,6 @@ class FamilyAccountUser(User):
     def all_members(self):
         return self.sub_users
 
-class FamilyMember(user):
+class FamilyMember(User):
     def __init__(self,name,user_id,age):
         super().__init__(name,user_id,age)

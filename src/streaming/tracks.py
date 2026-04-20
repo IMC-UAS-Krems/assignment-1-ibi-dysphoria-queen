@@ -14,6 +14,7 @@ Classes to implement:
     - AudiobookTrack
 """
 import datetime
+from streaming import sessions, users, playlists, artists, albums
 class Track:
     def __init__(self,track_id,title,duration_seconds,genre):
         self.track_id = track_id
@@ -41,10 +42,10 @@ class Song(Track):
         super().__init__(track_id,title,duration_seconds,genre)
         self.artist = artist
 class AlbumTrack(Song):
-    def __init__(self,track_id,title,duration_seconds,genre,artist,track_number,album):
+    def __init__(self,track_id,title,duration_seconds,genre,artist,track_number):
         super().__init__(track_id,title,duration_seconds,genre,artist)
+        self.album = None
         self.track_number = track_number
-        self.album = album
 class SingleRelease(Song):
     def __init__(self,track_id,title,duration_seconds,genre,artist,release_date):
         super().__init__(track_id,title,duration_seconds,genre,artist)

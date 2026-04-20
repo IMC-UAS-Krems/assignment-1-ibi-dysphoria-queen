@@ -7,6 +7,8 @@ Classes to implement:
   - Artist
 """
 import datetime
+from streaming import sessions, users, playlists, tracks, albums
+
 
 class Artist:
     tracks=[]

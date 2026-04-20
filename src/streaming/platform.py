@@ -7,11 +7,10 @@ and provides query methods for analytics.
 Classes to implement:
   - StreamingPlatform
 """
-import datetime
+from datetime import date
 from itertools import count
 
-from streaming import sessions, users, playlists
-from streaming.users import PremiumUser
+from streaming import sessions, users, playlists, tracks, artists, albums
 
 class StreamingPlatform :
     catalogue ={}
@@ -23,17 +22,17 @@ class StreamingPlatform :
     def __init__(self,name: str,):
         self.name = name
     def add_track(self,track):
-        self.catalogue.update({track.name:track})
+        self.catalogue.update({track.title:track})
     def add_user(self,user):
         self.users.update({user.name:user})
     def add_artist(self,artist):
         self.artists.update({artist.name:artist})
     def add_album(self,album):
-        self.albums.update({album.name:album})
+        self.albums.update({album.title:album})
     def add_playlist(self,playlist):
         self.playlists.update({playlist.name:playlist})
     def record_session(self,session):
-        self.sessions.update({session.name:session})
+        self.sessions.update({session.session_id:session})
     def get_track(self,track_id):
         return self.catalogue.get(track_id)
     def get_user(self,user_id):
@@ -49,23 +48,27 @@ class StreamingPlatform :
     def all_tracks(self):
         return self.catalogue
     def total_listening_time_minutes(self,start, end):
-        counter =0
+        counter =0.0
         for session in self.sessions:
             if session.start_time <= start and session.end_time >= end:
                 counter += session.total_listening_time_minutes
         return counter
     def avg_unique_tracks_per_premium_user(self,days: int = 30):
         counter =[]
-        no_of_premium_users = 0
-        last30days= datetime.datetime.now()
-        last30days.days = last30days.day - days
+        no_of_premium_users = 0.0
+        last30days= date.today()
+        last30days = last30days.day - days
         for session in self.sessions:
             if type(session.user).__name__ == 'PremiumUser':
                 if session.start_time <= last30days and session.end_time > last30days :
                     counter.append(session.track)
                     no_of_premium_users += 1
         counter=list(set(counter))
-        return len(counter)/no_of_premium_users
+        if no_of_premium_users > 0:
+            counter=float(len(counter))
+            return counter/no_of_premium_users
+        else:
+            return 0.0
     def track_with_most_distinct_listeners(self):
         listofusers =[]
         tracks ={}
@@ -76,11 +79,12 @@ class StreamingPlatform :
                 listofusers.append(session.user)
                 tracks[session.track]+=1
         sorted_tracks = dict(sorted(tracks.items(), key=lambda item: item[1], reverse=True))
-        return next(iter(sorted_tracks)).keys
+        first = next(iter(sorted_tracks)).keys
+        return first
 
     def top_artists_by_listening_time(self,n: int = 5):
         artists ={}
-        for session in sessions:
+        for session in self.sessions:
             if type(session.Track).__name__ == 'Song':
                 if session.Track.artist in artists:
                     artists[session.Track.artist]+=1
@@ -90,29 +94,29 @@ class StreamingPlatform :
         sorted_artists_list = list(sorted_artists.items())
         return sorted_artists_list[:n]
     def avg_session_duration_by_user_type(self):
-        users ={}
+        usercount ={}
         listening_times ={}
-        for session in sessions:
+        for session in self.sessions:
             if type(session.user).__name__ == 'FreeUser':
-                users["FreeUser"]+=1
+                usercount["FreeUser"]+=1
                 listening_times["FreeUser"]+=session.duration
             elif  type(session.user).__name__ == 'PremiumUser':
-                users["PremiumUser"]+=1
+                usercount["PremiumUser"]+=1
                 listening_times["PremiumUser"]+=session.duration
             elif type(session.user).__name__ == 'FamilyAccountUser':
-                users["FamilyAccountUser"]+=1
+                usercount["FamilyAccountUser"]+=1
                 listening_times["FamilyAccountUser"]+=session.duration
             elif type(session.user).__name__ == 'FamilyMember':
-                users["FamilyMember"]+=1
+                usercount["FamilyMember"]+=1
                 listening_times["FamilyMember"]+=session.duration
-        listening_times["FreeUser"]=listening_times["FreeUser"]/users["FreeUser"]
-        listening_times["PremiumUser"]=listening_times["PremiumUser"]/users["PremiumUser"]
-        listening_times["FamilyAccountUser"]=listening_times["FamilyAccountUser"]/users["FamilyMember"]
-        listening_times["FamilyMember"]=listening_times["FamilyMember"]/users["FamilyMember"]
+        listening_times["FreeUser"]=listening_times["FreeUser"]/usercount["FreeUser"]
+        listening_times["PremiumUser"]=listening_times["PremiumUser"]/usercount["PremiumUser"]
+        listening_times["FamilyAccountUser"]=listening_times["FamilyAccountUser"]/usercount["FamilyMember"]
+        listening_times["FamilyMember"]=listening_times["FamilyMember"]/usercount["FamilyMember"]
         return  list(listening_times.items())
 
     def total_listening_time_underage_sub_users_minutes(self,age_threshold: int = 18):
-        counter =0
+        counter =0.0
         for session in self.sessions:
             if session.user.age < age_threshold:
                 counter += session.total_listening_time_minutes
@@ -138,20 +142,20 @@ class StreamingPlatform :
                     counter.append(playlist)
         return counter
 
-   def avg_tracks_per_playlist_type(self):
+    def avg_tracks_per_playlist_type(self):
         playlisttypes ={"Playlist":float(0),
                     "CollaborativePlaylist":float(0)}
         playliststracks = {"Playlist": float(0),
                      "CollaborativePlaylist": float(0)}
         for playlist in self.playlists:
             if type(playlist).__name__ == 'CollaborativePlaylist':
-                playlisttypes["CollaborativePlaylist"]+=1
-                playliststracks["CollaborativePlaylist"]+=len(playlist.tracks)
+               playlisttypes["CollaborativePlaylist"]+=1
+               playliststracks["CollaborativePlaylist"]+=len(playlist.tracks)
             else:
                 playlisttypes["Playlist"]+=1
                 playliststracks["Playlist"]+=len(playlist.tracks)
-        playliststracks["Playlist"]=playliststracks["Playlist"]/playlisttypes["Playlist"]
-        playliststracks["CollaborativePlaylist"]=playliststracks["CollaborativePlaylist"]/playlisttypes["CollaborativePlaylist"]
+        if playlisttypes["Playlist"]>0:
+            playliststracks["Playlist"]=playliststracks["Playlist"]/playlisttypes["Playlist"]
+        if playlisttypes["CollaborativePlaylist"]>0:
+            playliststracks["CollaborativePlaylist"]=playliststracks["CollaborativePlaylist"]/playlisttypes["CollaborativePlaylist"]
         return playliststracks
-
-

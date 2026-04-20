@@ -7,6 +7,8 @@ Classes to implement:
   - ListeningSession
 """
 import datetime
+from streaming import  users, playlists, tracks, artists, albums
+
 class ListeningSession():
     def __init__(self, session_id, user, track, timestamp, duration_listened_seconds):
         self.session_id = session_id
@@ -15,4 +17,4 @@ class ListeningSession():
         self.timestamp = timestamp
         self.duration_listened_seconds = duration_listened_seconds
     def duration_listened_minutes(self):
-        return (self.duration_listened_seconds)/60
+        return self.duration_listened_seconds/60

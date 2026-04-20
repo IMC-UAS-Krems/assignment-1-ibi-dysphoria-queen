@@ -8,6 +8,7 @@ Classes to implement:
     - CollaborativePlaylist
 """
 import datetime
+from streaming import sessions, users, tracks, artists, albums
 class Playlist:
     tracks = []
     def __init__(self,playlist_id,name,owner):
@@ -16,12 +17,14 @@ class Playlist:
         self.owner = owner
     def add_track(self,track):
         self.tracks.append(track)
-    def remove_track(self,track):
-        self.tracks.remove(track)
-    def total_duration(self):
+    def remove_track(self,track_id):
+        for track in self.tracks:
+            if track.track_id == track_id:
+                self.tracks.remove(track)
+    def total_duration_seconds(self):
         total = 0
         for track in self.tracks:
-            total += (track.duration_minutes)*60
+            total += track.duration_seconds
         return total
 class CollaborativePlaylist(Playlist):
     contributors = []
