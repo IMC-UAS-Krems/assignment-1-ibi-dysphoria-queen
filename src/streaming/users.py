@@ -10,8 +10,7 @@ Classes to implement:
     - FamilyAccountUser
     - FamilyMember
 """
-from samba.dcerpc.smb_acl import user
-
+import datetime
 
 class User:
     sessions=[]
@@ -44,7 +43,7 @@ class PremiumUser(User):
     def __init__(self, name, user_id,age,subscription_start):
         super().__init__(name,user_id,age)
         self.subscription_start = subscription_start
-class FamilyAccount(user):
+class FamilyAccountUser(User):
     sub_users=[]
     def __init__(self,name,user_id,age):
         super().__init__(name,user_id,age)

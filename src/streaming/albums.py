@@ -6,6 +6,7 @@ Implement the Album class for collections of AlbumTrack objects.
 Classes to implement:
   - Album
 """
+import datetime
 from streaming import tracks
 
 
@@ -22,7 +23,7 @@ class Album:
         track_id =[]
         for i in range(len(self.tracks)):
             track_id.append(tracks[i].track_id)
-        return self.track_id
+        return track_id
     def duration_seconds(self):
         total = 0
         for track in self.tracks:

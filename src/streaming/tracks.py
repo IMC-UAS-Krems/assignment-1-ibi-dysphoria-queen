@@ -13,7 +13,7 @@ Classes to implement:
       - NarrativeEpisode
     - AudiobookTrack
 """
-
+import datetime
 class Track:
     def __init__(self,track_id,title,duration_seconds,genre):
         self.track_id = track_id
@@ -50,3 +50,8 @@ class SingleRelease(Song):
         super().__init__(track_id,title,duration_seconds,genre,artist)
         self.release_date = release_date
 
+class AudiobookTrack(Track):
+    def __init__(self, track_id, title, duration_seconds, genre, author, narrator):
+        super().__init__(track_id, title, duration_seconds, genre)
+        self.author = author
+        self.narrator = narrator
